@@ -1,7 +1,7 @@
 import type { Recipe } from "../types/nutrition";
 import { sum } from "../utils/calc";
 
-export default function RecipeCard({ recipe }: { recipe: Recipe }) {
+export default function RecipeCard({ recipe, onDelete }: { recipe: Recipe; onDelete: (id: string) => void }) {
   const totals = sum(recipe.items);
   return (
     <div className="p-3" style={{ border: "1px solid #eee", borderRadius: 12, marginBottom: 8 }}>
@@ -12,6 +12,11 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
           <li key={idx}>{it.name} {it.amount}{it.unit || "g"}</li>
         ))}
       </ul>
+        {onDelete && (
+        <button onClick={() => onDelete(recipe.id)} style={{ marginTop: 8 }}>
+          削除
+        </button>
+      )}
     </div>
   );
 }

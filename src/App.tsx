@@ -24,6 +24,7 @@ export default function App() {
 
   const scaledToBreakfast = useMemo(() => scaleRecipeByCalories(items, targets.breakfast), [items, targets.breakfast]);
   const scaledBreakfastTotals = useMemo(() => sum(scaledToBreakfast), [scaledToBreakfast]);
+  const pctBreakfast = Math.round((scaledBreakfastTotals.calories / targets.breakfast) * 100);
 
   function handleSave() {
     const r: Recipe = { id: crypto.randomUUID(), title: title || "無題レシピ", items };
@@ -37,6 +38,12 @@ export default function App() {
     StorageRepo.saveTargets(t);
   }
 
+  function handleDelete(id: string) {
+  const next = recipes.filter(r => r.id !== id);
+  setRecipes(next);
+  StorageRepo.saveRecipes(next);
+}
+
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
       <h2>栄養スケーリングMVP</h2>
@@ -47,6 +54,7 @@ export default function App() {
         <NutritionTotals totals={totals} title="現在の合計" />
         <NutritionTotals totals={scaledBreakfastTotals} title={`朝(${targets.breakfast}kcal)にスケール`} />
       </div>
+      <div style={{fontSize:12, opacity:.8}}>朝 目標達成率: {isFinite(pctBreakfast) ? pctBreakfast : 0}%</div>
 
       <div style={{ marginTop: 12, border: "1px solid #eee", borderRadius: 12, padding: 12 }}>
         <h4>レシピとして保存</h4>
@@ -55,7 +63,7 @@ export default function App() {
       </div>
 
       <h3 style={{ marginTop: 16 }}>登録済みレシピ</h3>
-      <RecipeList recipes={recipes} />
+      <RecipeList recipes={recipes} onDelete={handleDelete} />
     </div>
   );
 }
